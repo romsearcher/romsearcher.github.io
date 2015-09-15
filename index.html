@@ -6,8 +6,10 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
 	<title>romsearcher.io</title>
+	<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="dist/semantic.min.css">
 	<script src="dist/semantic.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
 	<style type="text/css">
 
 	.hidden.menu {
@@ -98,17 +100,51 @@
 
 	</style>
 
-	<script src="assets/library/jquery.min.js"></script>
-	<script src="../dist/components/visibility.js"></script>
-	<script src="../dist/components/sidebar.js"></script>
-	<script src="../dist/components/transition.js"></script>
 	<script>
-	$(document)
-	.ready(function() {
+	function doThis(){
+		var mouse = [480, 250],
+		count = 0;
+
+		// var svg = d3.select("body").append("svg").attr("width", "100%").attr("height", 500);
+		var svg = d3.select("svg.cosa");
+
+		var g = svg.selectAll("g")
+		.data(d3.range(25))
+		.enter().append("g")
+		.attr("transform", "translate(" + mouse + ")");
+		g.append("rect")
+		.attr("rx", 6)
+		.attr("ry", 6)
+		.attr("x", -12.5)
+		.attr("y", -12.5)
+		.attr("width", 25)
+		.attr("height", 25)
+		.attr("transform", function(d, i) { return "scale(" + (1 - d / 25) * 20 + ")"; })
+		.style("fill", d3.scale.category20c());
+		g.datum(function(d) {
+			return {center: [0, 0], angle: 0};
+		});
+		svg.on("mousemove", function() {
+			mouse = d3.mouse(this);
+		});
+		d3.timer(function() {
+			count++;
+			g.attr("transform", function(d, i) {
+				d.center[0] += (mouse[0] - d.center[0]) / (i + 5);
+				d.center[1] += (mouse[1] - d.center[1]) / (i + 5);
+				d.angle += Math.sin((count + i) / 10) * 7;
+				return "translate(" + d.center + ")rotate(" + d.angle + ")";
+			});
+		});
+	}	
+	</script>
+
+	<script>
+	$(document).ready(function() {
+		doThis();
 
       // fix menu when passed
-      $('.masthead')
-      .visibility({
+      $('.masthead').visibility({
       	once: false,
       	onBottomPassed: function() {
       		$('.fixed.menu').transition('fade in');
@@ -120,44 +156,44 @@
       ;
 
       // create sidebar and attach to menu open
-      $('.ui.sidebar')
-      .sidebar('attach events', '.toc.item')
-      ;
+      $('.ui.sidebar').sidebar('attach events', '.toc.item');
 
-  })
-	;
+      // d3.selectAll("p").style("color", function() {
+      // 	return "hsl(" + Math.random() * 360 + ",100%,50%)";
+      // });
+  });
 	</script>
+
 </head>
 <body>
 
 	<!-- Following Menu -->
 	<div class="ui large top fixed hidden menu">
 		<div class="ui container">
-			<a class="active item">Home</a>
-			<a class="item">Work</a>
-			<a class="item">Company</a>
-			<a class="item">Careers</a>
-			<div class="right menu">
+			<a class="active item">Inicio</a>
+			<a class="item">Proyectos</a>
+			<a class="item">Contacto</a>
+			<!-- <a class="item">Careers</a> -->
+			<!-- <div class="right menu">
 				<div class="item">
 					<a class="ui button">Log in</a>
 				</div>
 				<div class="item">
 					<a class="ui primary button">Sign Up</a>
 				</div>
-			</div>
+			</div> -->
 		</div>
 	</div>
 
 	<!-- Sidebar Menu -->
 	<div class="ui vertical inverted sidebar menu">
-		<a class="active item">Home</a>
-		<a class="item">Work</a>
-		<a class="item">Company</a>
-		<a class="item">Careers</a>
-		<a class="item">Login</a>
-		<a class="item">Signup</a>
+		<a class="active item">Inicio</a>
+		<a class="item">Proyectos</a>
+		<a class="item">Contacto</a>
+		<!-- <a class="item">Careers</a> -->
+		<!-- <a class="item">Login</a>
+		<a class="item">Signup</a> -->
 	</div>
-
 
 	<!-- Page Contents -->
 	<div class="pusher">
@@ -168,13 +204,13 @@
 					<a class="toc item">
 						<i class="sidebar icon"></i>
 					</a>
-					<a class="active item">Home</a>
-					<a class="item">Work</a>
-					<a class="item">Company</a>
-					<a class="item">Careers</a>
+					<a class="active item">Inicio</a>
+					<a class="item">Proyectos</a>
+					<a class="item">Contacto</a>
+					<!-- <a class="item">Careers</a> -->
 					<div class="right item">
-						<a class="ui inverted button">Log in</a>
-						<a class="ui inverted button">Sign Up</a>
+						<!-- <a class="ui inverted button">Log in</a>
+						<a class="ui inverted button">Sign Up</a> -->
 					</div>
 				</div>
 			</div>
@@ -184,8 +220,10 @@
 					Felipe Ot&aacute;lora
 				</h1>
 				<h2>Do whatever you want when you want to.</h2>
-				<div class="ui huge primary button">Get Started <i class="right arrow icon"></i></div>
+				<div class="ui huge primary button">Pr&oacute;ximamente <i class="right arrow icon"></i></div>
 			</div>
+			<br><br>
+			<svg class="cosa" width="100%" height="500">
 
 		</div>
 
@@ -193,18 +231,25 @@
 			<div class="ui middle aligned stackable grid container">
 				<div class="row">
 					<div class="eight wide column">
-						<h3 class="ui header">We Help Companies and Companions</h3>
-						<p>We can give your company superpowers to do things that they never thought possible. Let us delight your customers and empower your needs...through pure data analytics.</p>
-						<h3 class="ui header">We Make Bananas That Can Dance</h3>
-						<p>Yes that's right, you thought it was the stuff of dreams, but even bananas can be bioengineered.</p>
+						<h3 class="ui header">Informaci&oacute;n Contacto</h3>
+						<ul>
+							<li><b>Correo: </b> f.otalora10@uniandes.edu.co</li>
+							<li><b>Github: </b> https://github.com/romsearcher</li>
+						</ul>
+						<p>Me interesa la programaci&oacute;n, las p&aacute;ginas personales de Github.</p>
+						<h3 class="ui header">Lorem Ipsum!</h3>
+						<p>Lorem ipsum dolor sit amet.</p>
 					</div>
 					<div class="six wide right floated column">
-						<img src="assets/images/wireframe/white-image.png" class="ui large bordered rounded image">
+						<img src="http://semantic-ui.com/images/avatar2/large/matthew.png" class="ui large bordered rounded image">
 					</div>
 				</div>
 				<div class="row">
 					<div class="center aligned column">
-						<a class="ui huge button">Check Them Out</a>
+						<!-- <a class="ui huge button">Check Them Out</a> -->
+						<iframe src="https://www.google.com/maps/embed?pb=!1m10!1m8!1m3!1d63622.00946339465!2d-74.0574922!3d4.7046444!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sco!4v1442321668261" width="600" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>
+
+						<g></g>
 					</div>
 				</div>
 			</div>
